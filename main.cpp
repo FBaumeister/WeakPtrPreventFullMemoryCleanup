@@ -35,7 +35,7 @@ void printMemoryUsage()
 }
 
 
-static constexpr auto DATASIZE = 1024 * 1024 * 1024;
+static constexpr auto DATASIZE = 100 * 1024 * 1024; // Make this large enough to see some impact
 
 class DataArray
 {
@@ -65,13 +65,9 @@ template<class DataType> void createAndDestroy_makeShared()
     std::cout << "Expectation: weak_ptr keeps ctrl-block alive and data allocated!" << std::endl;
     printMemoryUsage();
 
-    weak.reset();
+    weak.reset();  // verbose
     std::cout << "Expectation: All back to 'normal'" << std::endl;
     printMemoryUsage();
-    if(auto locked = weak.lock())
-    {
-        std::cout << "Still alive!" << std::endl;
-    }
 }
 
 template<class DataType> void createAndDestroy_new()
@@ -89,18 +85,18 @@ template<class DataType> void createAndDestroy_new()
     std::cout << "Expectation: All back to 'normal'" << std::endl;
     printMemoryUsage();
 
-    weak.reset();
-    std::cout << "Expectation: All back to 'normal'" << std::flush;
+    weak.reset();  // verbose
+    std::cout << "Expectation: All back to 'normal'" << std::endl;
     printMemoryUsage();
 }
 
 
 int main()
 {
-    std::cout << "Base Memory" << std::endl;
+    std::cout << "Memory at Start" << std::endl;
     printMemoryUsage();
 
-    std::cout << "\n\nData in Ctrl-Block" << std::endl;
+    std::cout << "\n\nData inside Ctrl-Block" << std::endl;
     createAndDestroy_makeShared<DataArray>();
     createAndDestroy_new<DataArray>();
 
@@ -110,11 +106,11 @@ int main()
      * The internal mechanics are the same, but the impact on memory consumption
      * are totally different.
      */
-    std::cout << "\n\nData managed by Ctrl-Block" << std::endl;
+    std::cout << "\n\nData pointed to by Ctrl-Block" << std::endl;
     createAndDestroy_makeShared<DataPtr>();
     createAndDestroy_new<DataPtr>();
 
-    std::cout << "Before Return" << std::endl;
+    std::cout << "\nMemory beofre Exit" << std::endl;
     printMemoryUsage();
 
     return 0;
